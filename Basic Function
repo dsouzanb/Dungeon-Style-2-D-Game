@@ -1,0 +1,29 @@
+import arcade
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+class FigureMover(arcade.Window):
+  def __init__(self)
+      super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+      #Figure Initiall Position
+      self.rect_x = SCREEN_WIDTH //2
+      self.rect_y = SCREEN_HEIGHT //2
+
+	def on_key_press(self, key, modifiers):
+	""" Called whenever the user presses a key. """
+        if key == arcade.key.UP:
+            self.rect_y += MOVEMENT_SPEED
+        elif key == arcade.key.DOWN:
+            self.rect_y -= MOVEMENT_SPEED
+        elif key == arcade.key.LEFT:
+            self.rect_x -= MOVEMENT_SPEED
+        elif key == arcade.key.RIGHT:
+            self.rect_x += MOVEMENT_SPEED
+
+def main():
+    window = FigureMover()
+    arcade.run()
+
+ main()
