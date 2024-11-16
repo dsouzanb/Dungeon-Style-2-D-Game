@@ -1,6 +1,3 @@
-"""
-Sprite move between different rooms.
-
 
 
 import arcade
@@ -34,8 +31,6 @@ class Room:
 def setup_room_1():
     """
     Create and return room 1.
-    If your program gets large, you may want to separate this into different
-    files.
     """
     room = Room()
 
@@ -73,7 +68,7 @@ def setup_room_1():
     wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
 
-    # If you want coins or monsters in a level, then add that code here.
+    #  coins or monsters add here.
 
     # Load the background image for this level.
     room.background = arcade.load_texture(":resources:images/backgrounds/"
@@ -85,8 +80,6 @@ def setup_room_1():
 def setup_room_2():
     """
     Create and return room 2.
-    If your program gets large, you may want to separate this into different
-    files.
     """
     room = Room()
 
