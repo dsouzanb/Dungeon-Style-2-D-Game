@@ -53,7 +53,10 @@ class Enemy(arcade.Sprite):
             return True
         return False
 
-
+class healingItem(arcade.Sprite):
+    def __init__(self, image, scling, heal_amount):
+        super().__init__(image, scaling)
+        self.heal_amount = heal_amount
 
 class Room:
     def __init__(self):
@@ -87,10 +90,12 @@ def setup_room_1():
     # Sprite lists
     room.wall_list = arcade.SpriteList()
     room.enemy_list = arcade.SpriteList()
+    room.item_list = arcade.SpriteList()
+
+    enemy_images = [":resources:images/enemies/goblinsingle.png"]
 
     for row_index, row in enumerate(level_data):
         for col_index, col in enumerate(row):
-           
             x = (col_index * SPRITE_SIZE ) + 20
             y = ((len(level_data) - row_index - 1) * SPRITE_SIZE) + 20
 
@@ -108,7 +113,8 @@ def setup_room_1():
                 enemy.center_y = y
                 room.enemy_list.append(enemy)
     
-
+        # Randomly place healing items
+    
 
     # Load the background image for this level.
     room.background = arcade.load_texture("images/watercave.png")
@@ -141,6 +147,9 @@ def setup_room_2():
     # Sprite lists
     room.wall_list = arcade.SpriteList()
     room.enemy_list = arcade.SpriteList()
+    room.item_list = arcade.SpriteList()
+
+    enemy_images = [":resources:images/enemies/skeleton_warrior.png"]
 
     for row_index, row in enumerate(level_data):
         for col_index, col in enumerate(row):
@@ -194,6 +203,9 @@ def setup_room_3():
     # Sprite lists
     room.wall_list = arcade.SpriteList()
     room.enemy_list = arcade.SpriteList()
+    room.item_list = arcade.SpriteList()
+
+    #enemy_images = [":resources:images/enemies/skeleton.png"]
 
     for row_index, row in enumerate(level_data):
         for col_index, col in enumerate(row):
@@ -391,8 +403,12 @@ class MyGame(arcade.Window):
             if arcade.check_for_collision(self.player_sprite, enemy) and enemy.canIAtk():
                 self.player_health -= 10
 
-        
-
+        # Checks for item collection
+        for item in self.rooms[self.current_room].item_list:
+            if arcade.check_for_collision(self.player_sprite, item):
+                self.player_health = min(self.max_health, self.player_health + item.heal_amount)
+                item.kill() 
+    
         if self.is_game_over:
             return
         #gameover check
