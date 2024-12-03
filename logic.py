@@ -1,4 +1,4 @@
-import time
+import arcade
 
 SPRITE_SCALING = 0.3
 ROOMS = []
@@ -10,8 +10,8 @@ class Room:
     def __init__(self, name, description, walls=None, enemies=None):
         self.name = name
         self.description = description
-        self.walls = walls or []
-        self.enemies = enemies or []
+        self.walls = walls 
+        self.enemies = enemies 
 
     def display(self):
         """Display the room information."""
@@ -31,7 +31,7 @@ class Player:
     def __init__(self, name):
         self.name = name
         self.health = 100
-        self.position = (1, 1)  # Starting position
+        self.position = [1, 1]  # Starting position
         self.current_room = 0
 
     def move(self, direction):
@@ -45,11 +45,8 @@ class Player:
             x -= MOVEMENT_SPEED
         elif direction == "RIGHT":
             x += MOVEMENT_SPEED
-        else:
-            print("Invalid direction.")
-            return
 
-        self.position = (x, y)
+        self.position = [x, y]
         print(f"{self.name} moves {direction} to {self.position}.")
 
     def attack(self, enemy):
@@ -59,6 +56,96 @@ class Player:
         print(f"{self.name} attacks {enemy.name} for {damage} damage!")
         if enemy.health <= 0:
             print(f"{enemy.name} is defeated!")
+
+
+class Goblin:
+    def __init__(self):
+        self.name = "Goblin"
+        self.damage = 10
+        self.health = 30
+
+
+class Skeleton:
+    def __init__(self):
+        self.name = "Skeleton"
+        self.damage = 15
+        self.health = 40
+
+
+class GameWindow(arcade.Window):
+    """Main game window."""
+
+    def __init__(self):
+        super().__init__(800, 600, "Text Adventure Game")
+        arcade.set_background_color(arcade.color.BLACK)
+        self.player = Player(name="Hero")
+        self.current_room = None
+        create_rooms()
+        self.update_room()
+
+    def update_room(self):
+        """Update the current room."""
+        self.current_room = ROOMS[self.player.current_room]
+        self.current_room.display()
+
+    def on_draw(self):
+        """Render the screen."""
+        arcade.start_render()
+        arcade.draw_text(
+            f"Player Health: {self.player.health}",
+            10, 570, arcade.color.WHITE, 14
+        )
+        arcade.draw_text(
+            f"Current Room: {self.current_room.name}",
+            10, 550, arcade.color.WHITE, 14
+        )
+        arcade.draw_text(
+            f"Player Position: {self.player.position}",
+            10, 530, arcade.color.WHITE, 14
+        )
+
+    def on_key_press(self, key, modifiers):
+        """Handle keyboard input."""
+        if key == arcade.key.UP:
+            self.player.move("UP")
+        elif key == arcade.key.DOWN:
+            self.player.move("DOWN")
+        elif key == arcade.key.LEFT:
+            self.player.move("LEFT")
+        elif key == arcade.key.RIGHT:
+            self.player.move("RIGHT")
+        elif key == arcade.key.A:
+            if self.current_room.enemies:
+                self.player.attack(self.current_room.enemies[0])
+                # Enemy retaliates if still alive
+                if self.current_room.enemies[0].health > 0:
+                    enemy = self.current_room.enemies[0]
+                    self.player.health -= enemy.damage
+                    print(f"{enemy.name} attacks back for {enemy.damage} damage!")
+                else:
+                    self.current_room.enemies.pop(0)
+            else:
+                print("No enemies to attack here.")
+        elif key == arcade.key.Q:
+            print("Exiting the game. Goodbye!")
+            arcade.close_window()
+
+        # Room transitions
+        if self.player.position[1] > 5 and self.player.current_room == 0:
+            print("You move to Room 2.")
+            self.player.current_room = 1
+            self.player.position = [1, 1]
+            self.update_room()
+        elif self.player.position[1] < 0 and self.player.current_room == 1:
+            print("You move to Room 1.")
+            self.player.current_room = 0
+            self.player.position = [1, 1]
+            self.update_room()
+
+        # Check if the player is defeated
+        if self.player.health <= 0:
+            print("You have been defeated. Game Over.")
+            arcade.close_window()
 
 
 def create_rooms():
@@ -78,74 +165,6 @@ def create_rooms():
     ROOMS.extend([room1, room2])
 
 
-def game_loop():
-    """Main game loop."""
-    player = Player(name="Hero")
-    create_rooms()
-
-    while True:
-        current_room = ROOMS[player.current_room]
-        current_room.display()
-        print(f"{player.name}'s health: {player.health}")
-
-        if not current_room.enemies:
-            print("No enemies here. Move to another room.")
-
-        # Handle player actions
-        action = input("Enter action (MOVE [UP/DOWN/LEFT/RIGHT], ATTACK, or QUIT): ").strip().upper()
-        if action.startswith("MOVE"):
-            direction = action.split()[1]
-            player.move(direction)
-        elif action == "ATTACK":
-            if current_room.enemies:
-                player.attack(current_room.enemies[0])
-                # Enemy retaliates if still alive
-                if current_room.enemies[0].health > 0:
-                    enemy = current_room.enemies[0]
-                    player.health -= enemy.damage
-                    print(f"{enemy.name} attacks back for {enemy.damage} damage!")
-                else:
-                    current_room.enemies.pop(0)
-            else:
-                print("No enemies to attack here.")
-        elif action == "QUIT":
-            print("Exiting the game. Goodbye!")
-            break
-        else:
-            print("Invalid action.")
-
-        # Process room transitions
-        if player.position[1] > 5 and player.current_room == 0:
-            print("You move to Room 2.")
-            player.current_room = 1
-            player.position = (1, 1)
-        elif player.position[1] < 0 and player.current_room == 1:
-            print("You move to Room 1.")
-            player.current_room = 0
-            player.position = (1, 1)
-
-        # Pause for readability
-        time.sleep(1)
-
-        # Check if the player is defeated
-        if player.health <= 0:
-            print("You have been defeated. Game Over.")
-            break
-
-
-class Goblin:
-    def __init__(self):
-        self.name = "Goblin"
-        self.damage = 10
-        self.health = 30
-
-
-class Skeleton:
-    def __init__(self):
-        self.name = "Skeleton"
-        self.damage = 15
-        self.health = 40
-
-
 if __name__ == "__main__":
-    game_loop()
+    GameWindow()
+    arcade.run()
