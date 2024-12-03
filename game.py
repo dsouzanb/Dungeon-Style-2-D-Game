@@ -22,6 +22,12 @@ class Enemy(arcade.Sprite):
         self.speed = ENEMY_SPEED
         self.last_atk_time = 0
         self.atk_cooldown = 1.0
+        self.health = 30
+
+    def take_damage(self, amount)
+        self.health -= amount
+        if self.health <= 0:
+            self.kill()
 
     def chasing(self, player_sprite):
         #distance calcs
@@ -224,6 +230,8 @@ class MyGame(arcade.Window):
 
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
+        self.player_attack_cooldown = 0.50
+        self.last_attack_time = 0
 
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
@@ -243,10 +251,19 @@ class MyGame(arcade.Window):
 
         self.is_game_over = False
 
+    def player_attck(self):
+        cur_time = time.time()
+        if cur_time - self.last_attack_time >= self.player_attack_cooldown:
+            self.last_attack_time = cur_time
+            return True
+        return False
+
+    def perfrom_attck(self):
+        for enemy in self.rooms[self.current_room].enemy_list:
+            if arcade.check_for_collision(self.player_sprite, enemy):
+                enemy.take_damage(10)
+
        
-
-
-
     def setup(self):
         """ Set up the game and initialize the variables. """
         # Set up the player
@@ -322,12 +339,22 @@ class MyGame(arcade.Window):
                              
             )
             return
+        # Enemy health bar implentation
+        for enemy in self.rooms[self.current_room].enemy_list:
+            bar_width = 40
+            bar_height = 5
+            bar_x = enemy.center_x - bar_width // 2
+            bar_y = enemy.center_y + 20
+            health_percentage = max(enemy.health / 30, 0)
+            arcade.draw_xywh_rectangle_filled(bar_x,bar_y, bar_width, bar_height, arcade.color.DARK_RED)
+            arcade.draw_xywh_rectangle_filled(bar_x, bar_y, bar_width * health_percentage, bar_height, arcade.color.GREEN)
 
 
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
-
+        if key == arcade.key.SPACE and self.player_can_attack():
+            self.perform_attack()
         if key == arcade.key.UP:
             self.player_sprite.change_y = MOVEMENT_SPEED
         elif key == arcade.key.DOWN:
