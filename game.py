@@ -174,7 +174,7 @@ def setup_room_2():
 
 
     # Load the background image for this level.
-    room.background = arcade.load_texture("images/watercave.png")
+    room.background = arcade.load_texture("images/lava.png")
 
     return room
 
