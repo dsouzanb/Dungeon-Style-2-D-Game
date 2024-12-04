@@ -9,9 +9,8 @@ SPRITE_SCALING = 0.4
 SPRITE_NATIVE_SIZE = 128
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 
-SPRITE_SCALING_PROJECTILE = 0.3
-PROJECTILE_SPEED = 5
-
+SPRITE_SCALING_PROJECTILE = 0.2
+PROJECTILE_SPEED = 4
 
 SCREEN_WIDTH = SPRITE_SIZE * 20
 SCREEN_HEIGHT = SPRITE_SIZE * 14
@@ -19,6 +18,7 @@ SCREEN_TITLE = "Dungeon Game"
 
 MOVEMENT_SPEED = 3
 ENEMY_SPEED = 0.75
+
 
 class Enemy(arcade.Sprite):
     def __init__(self, image, scaling, speed):
@@ -52,10 +52,28 @@ class Enemy(arcade.Sprite):
             return True
         return False
 
+
 class healingItem(arcade.Sprite):
     def __init__(self, image, scaling, heal_amount):
         super().__init__(image, scaling)
         self.heal_amount = heal_amount
+
+
+class Lava(arcade.Sprite):
+    def __init__(self, image, scaling, damage_per_second):
+        super().__init__(image, scaling)
+        self.damage_per_second = damage_per_second
+
+
+class Water(arcade.Sprite):
+    def __init__(self, image, scaling, speed_modifier):
+        super().__init__(image, scaling)
+        self.speed_modifier = speed_modifier
+
+    def apply_effect(self, player):
+        player.current_movement_speed *= self.speed_modifier
+
+
 
 class Room:
     def __init__(self):
@@ -64,6 +82,8 @@ class Room:
         self.enemy_list = arcade.SpriteList()
         self.projectile_list = arcade.SpriteList()
         self.item_list = arcade.SpriteList()
+        self.lava_list = arcade.SpriteList()
+        self.water_list = arcade.SpriteList()
 
 
 def load_rooms_from_json(file_path):
@@ -85,13 +105,27 @@ def load_rooms_from_json(file_path):
                     room.player_start_x = x
                     room.player_start_y = y
                 elif col == "E":
-                    enemy = Enemy(":resources:images/enemies/slimePurple.png", SPRITE_SCALING, speed=2)
+                    enemy = Enemy("images/skeleton_warrior.png", (SPRITE_SCALING * 0.4), speed=2)
                     enemy.center_x = x
                     enemy.center_y = y
                     room.enemy_list.append(enemy)
+                elif col == "L":
+                    lava = Lava(":resources:images/tiles/lava.png", SPRITE_SCALING, damage_per_second=5)
+                    lava.center_x = x
+                    lava.center_y = y
+                    room.lava_list.append(lava)
+                elif col == "A":
+                    water = Water(":resources:images/tiles/water.png", SPRITE_SCALING, speed_modifier=0.5)
+                    water.center_x = x
+                    water.center_y = y
+                    room.water_list.append(water)
+                elif col == "D":
+                    room.door_x = x
+                    room.door_y = y
         room.background = arcade.load_texture(room_data["background"])
         rooms.append(room)
     return rooms
+
 
 class MyGame(arcade.Window):
     def __init__(self, width, height, title):
@@ -108,6 +142,8 @@ class MyGame(arcade.Window):
         self.player_health = 100
         self.max_health = 100
         self.is_game_over = False
+        self.base_movement_speed = MOVEMENT_SPEED
+        self.current_movement_speed = MOVEMENT_SPEED
 
     def player_attack(self):
         cur_time = time.time()
@@ -125,32 +161,33 @@ class MyGame(arcade.Window):
             print("No enemies in the room.")
 
     def setup(self):
-        self.player_sprite = arcade.Sprite(":resources:images/animated_characters/female_person/femalePerson_idle.png", SPRITE_SCALING)
+        self.player_sprite = arcade.Sprite("images/knight4.png", SPRITE_SCALING)
         self.player_sprite.center_x = 100
         self.player_sprite.center_y = 100
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player_sprite)
-
-        # Load rooms from JSON
         self.rooms = load_rooms_from_json("levels.json")
         self.current_room = 0
         self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
 
+    def change_room(self, next_room):
+        if 0 <= next_room < len(self.rooms):
+            self.current_room = next_room
+            room = self.rooms[self.current_room]
+            self.player_sprite.center_x = room.player_start_x
+            self.player_sprite.center_y = room.player_start_y
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, room.wall_list)
+
     def on_draw(self):
-        """
-        Render the screen.
-        """
-        # This command has to happen before we start drawing
         self.clear()
         arcade.draw_lrwh_rectangle_textured(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.rooms[self.current_room].background)
         self.rooms[self.current_room].wall_list.draw()
-        # Draw all the monsters in this room
+        self.rooms[self.current_room].lava_list.draw()
+        self.rooms[self.current_room].water_list.draw()
         self.rooms[self.current_room].enemy_list.draw()
-        # Draw projectiles for the room
         self.rooms[self.current_room].projectile_list.draw()
-
-        #player stuff-health etc...
         self.player_list.draw()
+
         bar_width = 200
         bar_height = 20
         bar_x = 40
@@ -161,8 +198,9 @@ class MyGame(arcade.Window):
         arcade.draw_xywh_rectangle_outline(bar_x, bar_y, bar_width, bar_height, arcade.color.BLACK, border_width=2)
         if self.is_game_over:
             arcade.draw_text("GAME OVER", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, arcade.color.RED, 50, anchor_x="center")
-            arcade.draw_text("Press 'r' to restart:", SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, arcade.color.WHITE, 30, anchor_x="center")
+            arcade.draw_text("Press 'R' to restart:", SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, arcade.color.WHITE, 30, anchor_x="center")
             return
+
         for enemy in self.rooms[self.current_room].enemy_list:
             bar_width = 40
             bar_height = 5
@@ -176,13 +214,13 @@ class MyGame(arcade.Window):
         if key == arcade.key.SPACE and self.player_attack():
             self.perform_attack()
         if key == arcade.key.UP:
-            self.player_sprite.change_y = MOVEMENT_SPEED
+            self.player_sprite.change_y = self.current_movement_speed
         elif key == arcade.key.DOWN:
-            self.player_sprite.change_y = -MOVEMENT_SPEED
+            self.player_sprite.change_y = -self.current_movement_speed
         elif key == arcade.key.LEFT:
-            self.player_sprite.change_x = -MOVEMENT_SPEED
+            self.player_sprite.change_x = -self.current_movement_speed
         elif key == arcade.key.RIGHT:
-            self.player_sprite.change_x = MOVEMENT_SPEED
+            self.player_sprite.change_x = self.current_movement_speed
         if self.is_game_over and key == arcade.key.R:
             self.setup()
             self.is_game_over = False
@@ -225,6 +263,17 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time):
         self.physics_engine.update()
+        self.current_movement_speed = self.base_movement_speed
+        for lava in self.rooms[self.current_room].lava_list:
+            if arcade.check_for_collision(self.player_sprite, lava):
+                self.player_health -= lava.damage_per_second * delta_time
+                if self.player_health <= 0:
+                    self.is_game_over = True
+                    return
+        for water in self.rooms[self.current_room].water_list:
+            if arcade.check_for_collision(self.player_sprite, water):
+                water.apply_effect(self)
+
         for enemy in self.rooms[self.current_room].enemy_list:
             enemy.chasing(self.player_sprite)
             if arcade.check_for_collision(self.player_sprite, enemy) and enemy.canIAtk():
@@ -278,10 +327,12 @@ class MyGame(arcade.Window):
 
 
 
+
 def main():
-    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    window.setup()
+    game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    game.setup()
     arcade.run()
+
 
 if __name__ == "__main__":
     main()
