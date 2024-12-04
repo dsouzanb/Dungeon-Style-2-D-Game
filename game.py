@@ -62,7 +62,7 @@ class Room:
         self.wall_list = arcade.SpriteList()
         self.background = None
         self.enemy_list = arcade.SpriteList()
-        self.projectile_list = None
+        self.projectile_list = arcade.SpriteList()
         self.item_list = arcade.SpriteList()
 
 
