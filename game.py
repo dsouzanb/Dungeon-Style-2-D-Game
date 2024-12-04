@@ -24,7 +24,7 @@ class Enemy(arcade.Sprite):
         self.atk_cooldown = 1.0
         self.health = 30
 
-    def take_damage(self, amount)
+    def take_damage(self, amount):
         self.health -= amount
         if self.health <= 0:
             self.kill()
