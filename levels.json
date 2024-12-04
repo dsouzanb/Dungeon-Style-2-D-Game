@@ -1,0 +1,61 @@
+{
+  "rooms": [
+    {
+      "background": "images/watercave.png",
+      "layout": [
+        "WWWWWWWWWWWWWWWWWWWW",
+        "W.....W............W",
+        "W.......E...WWWW...W",
+        "W....W....W........W",
+        "W....W.............W",
+        "W....W.............W",
+        "W....W..E...WWWW...W",
+        "W......W..W........W",
+        "WWWWWW..W...W.......",
+        "W.......W...W.......",
+        "W.......W...WWWWWWWW",
+        "W.P..W..W...W..E..WW",
+        "W....W..W.........WW",
+        "WWWWWWWWWWWWWWWWWWWW"
+      ]
+    },
+    {
+      "background": "images/watercave.png",
+      "layout": [
+        "WWWWWWWWWWWWWWWWWWWW",
+        "W.......E...........",
+        "W.....W.............",
+        "W......WWWWWWWW....W",
+        "W....W.W......W....W",
+        "W....W........W....W",
+        "W...W...E...WWWW...W",
+        "W...W.......W......W",
+        ".WWWWW..W...W......W",
+        "........W.W.W......W",
+        "W.......W...WWWWWWWW",
+        "W....WW.W...W..E..WW",
+        "W....W............WW",
+        "WWWWWWWWWWWWWWWWWWWW"
+      ]
+    },
+    {
+      "background": "images/lava.png",
+      "layout": [
+        "WWWWWWWWWWWWWWWWWWWW",
+        ".....E......W......W",
+        ".........W.W..W....W",
+        "W.......W...W.W....W",
+        "W......W..E..W.....W",
+        "W......W..W..W.....W",
+        "W......W..W..W.....W",
+        "W.......W.E.W...W..W",
+        "W......W..W..W..W..W",
+        "W......W..W..W.W...W",
+        "W......W..W..W.W...W",
+        "W.......W.E.W..W...W",
+        "W....,..W.....W....W",
+        "WWWWWWWWWWWWWWWWWWWW"
+      ]
+    }
+  ]
+}
