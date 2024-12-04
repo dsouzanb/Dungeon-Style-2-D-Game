@@ -4,17 +4,20 @@ import math
 import random
 import time
 
-SPRITE_SCALING = 0.3
+SPRITE_SCALING = 0.4
 SPRITE_NATIVE_SIZE = 128
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
+
+SPRITE_SCALING_PROJECTILE = 0.3
+PROJECTILE_SPEED = 5
 
 
 SCREEN_WIDTH = SPRITE_SIZE * 20
 SCREEN_HEIGHT = SPRITE_SIZE * 14
 SCREEN_TITLE = "Dungeon Game"
 
-MOVEMENT_SPEED = 2
-ENEMY_SPEED = 0.50
+MOVEMENT_SPEED = 3
+ENEMY_SPEED = 0.75
 
 class Enemy(arcade.Sprite):
     def __init__(self, image, scaling, speed):
@@ -24,7 +27,7 @@ class Enemy(arcade.Sprite):
         self.atk_cooldown = 1.0
         self.health = 30
 
-    def take_damage(self, amount)
+    def take_damage(self, amount):
         self.health -= amount
         if self.health <= 0:
             self.kill()
@@ -54,13 +57,13 @@ class Enemy(arcade.Sprite):
         return False
 
 
-
 class Room:
     def __init__(self):
         # You may want many lists. Lists for coins, monsters, etc.
         self.wall_list = None
         self.background = None
         self.enemy_list = None
+        self.projectile_list = None
 
 
 def setup_room_1():
@@ -79,7 +82,6 @@ def setup_room_1():
         "W.P..W......W..E..WW",
         "W....W............WW",
         "WWWWWWWWWWWWWWWWWWWW",
-
     ]
     room = Room()
 
@@ -87,6 +89,7 @@ def setup_room_1():
     # Sprite lists
     room.wall_list = arcade.SpriteList()
     room.enemy_list = arcade.SpriteList()
+    room.projectile_list = arcade.SpriteList()
 
     for row_index, row in enumerate(level_data):
         for col_index, col in enumerate(row):
@@ -115,9 +118,7 @@ def setup_room_1():
 
     return room
 
-
 def setup_room_2():
-  
     level_data = [
         "WWWWWWWWWWWWWWWWWWWW",
         "W...................",
@@ -126,14 +127,13 @@ def setup_room_2():
         "W..................W",
         "W....W.............W",
         "W.......E...WWWW...W",
-        "W...........W......W",
-        ".WWWWW......W......W",
+        "WWWWWW......W......W",
+        "............W......W",
         "............W......W",
         "W...........WWWWWWWW",
         "W....W......W..E..WW",
         "W....W............WW",
         "WWWWWWWWWWWWWWWWWWWW",
-
     ]
     room = Room()
 
@@ -141,6 +141,7 @@ def setup_room_2():
     # Sprite lists
     room.wall_list = arcade.SpriteList()
     room.enemy_list = arcade.SpriteList()
+    room.projectile_list = arcade.SpriteList()
 
     for row_index, row in enumerate(level_data):
         for col_index, col in enumerate(row):
@@ -170,7 +171,6 @@ def setup_room_2():
     return room
 
 def setup_room_3():
- 
     level_data = [
         "WWWWWWWWWWWWWWWWWWWW",
         "..........W........W",
@@ -186,7 +186,6 @@ def setup_room_3():
         "W.......W...W......W",
         "W....,...W.W.......W",
         "WWWWWWWWWWWWWWWWWWWW",
-
     ]
     room = Room()
 
@@ -194,6 +193,7 @@ def setup_room_3():
     # Sprite lists
     room.wall_list = arcade.SpriteList()
     room.enemy_list = arcade.SpriteList()
+    room.projectile_list = arcade.SpriteList()
 
     for row_index, row in enumerate(level_data):
         for col_index, col in enumerate(row):
@@ -223,11 +223,7 @@ def setup_room_3():
     return room
 
 
-
-
 class MyGame(arcade.Window):
-
-
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
         self.player_attack_cooldown = 0.50
@@ -298,11 +294,8 @@ class MyGame(arcade.Window):
         """
         Render the screen.
         """
-
         # This command has to happen before we start drawing
         self.clear()
-
-
 
         # Draw the background texture
         arcade.draw_lrwh_rectangle_textured(0, 0,
@@ -311,10 +304,10 @@ class MyGame(arcade.Window):
 
         # Draw all the walls in this room
         self.rooms[self.current_room].wall_list.draw()
-        
-        #monster draw
+        # Draw all the monsters in this room
         self.rooms[self.current_room].enemy_list.draw()
-        
+        # Draw projectiles for the room
+        self.rooms[self.current_room].projectile_list.draw()
 
         #player stuff-health etc...
         self.player_list.draw()
@@ -350,7 +343,6 @@ class MyGame(arcade.Window):
             arcade.draw_xywh_rectangle_filled(bar_x, bar_y, bar_width * health_percentage, bar_height, arcade.color.GREEN)
 
 
-
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
         if key == arcade.key.SPACE and self.player_can_attack():
@@ -378,6 +370,35 @@ class MyGame(arcade.Window):
         elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
             self.player_sprite.change_x = 0
 
+    def on_mouse_press(self, x, y, button, modifiers):
+        """ Called when the mouse button is clicked """
+        # Create a projectile
+        projectile = arcade.Sprite(":resources:images/tiles/rock.png", SPRITE_SCALING_PROJECTILE)
+
+        # Position the projectile at the player's current location
+        start_x = self.player_sprite.center_x
+        start_y = self.player_sprite.center_y
+        projectile.center_x = start_x
+        projectile.center_y = start_y
+
+        # Calculating the angle in radians between the start points
+        # and end points. This is the angle the projectile will travel.
+        x_diff = x - start_x
+        y_diff = y - start_y
+        angle = math.atan2(y_diff, x_diff)
+
+        # Angle the projectile sprite so it doesn't look like it's flying.
+        projectile.angle = math.degrees(angle)
+        print(f"Projectile angle: {projectile.angle:.2f}")
+
+        # Taking into account the angle, calculate our change_x
+        # and change_y. Velocity is how fast the projectile travels.
+        projectile.change_x = math.cos(angle) * PROJECTILE_SPEED
+        projectile.change_y = math.sin(angle) * PROJECTILE_SPEED
+
+        # Add the projectile to the appropriate lists
+        self.rooms[self.current_room].projectile_list.append(projectile)
+
     def on_update(self, delta_time):
         """ Movement and game logic """
 
@@ -385,21 +406,16 @@ class MyGame(arcade.Window):
         # example though.)
         self.physics_engine.update()
         
-        #for enemies:
         for enemy in self.rooms[self.current_room].enemy_list:
             enemy.chasing(self.player_sprite)
             if arcade.check_for_collision(self.player_sprite, enemy) and enemy.canIAtk():
                 self.player_health -= 10
-
-        
 
         if self.is_game_over:
             return
         #gameover check
         if self.player_health <= 0:
             self.is_game_over = True
-            
-        
 
         # Do some logic here to figure out what room we are in, and if we need to go
         # to a different room.
@@ -426,8 +442,28 @@ class MyGame(arcade.Window):
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite,
                                                              self.rooms[self.current_room].wall_list)
             self.player_sprite.center_x = SCREEN_WIDTH
+        
+        # Call update on all sprites
+        projectiles = self.rooms[self.current_room].projectile_list
+        enemies = self.rooms[self.current_room].enemy_list
 
+        projectiles.update()
 
+        # Loop thru each projectile
+        for projectile in projectiles:
+            # Check this projectile to see if it hit an enemy
+            hit_list = arcade.check_for_collision_with_list(projectile, enemies)
+
+            # If it did, get rid of projectile
+            if hit_list:
+                projectile.remove_from_sprite_lists()
+                for enemy in hit_list:
+                    enemy.take_damage(10)
+
+            # If the projectile flies off screen, remove it
+            if (projectile.bottom > SCREEN_HEIGHT or projectile.top < 0
+            or projectile.right < 0 or projectile.left > SCREEN_WIDTH):
+                projectile.remove_from_sprite_lists()
 
 
 
