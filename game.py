@@ -122,6 +122,11 @@ def load_rooms_from_json(file_path):
                 elif col == "D":
                     room.door_x = x
                     room.door_y = y
+                elif col == "H":
+                    healing_item = healingItem("images/healing_plant.png", SPRITE_SCALING  / 4, heal_amount =20)
+                    healing_item.center_x = x
+                    healing_item.center_y = y
+                    room.item_list.append(healing_item)
         room.background = arcade.load_texture(room_data["background"])
         rooms.append(room)
     return rooms
@@ -187,6 +192,8 @@ class MyGame(arcade.Window):
         self.rooms[self.current_room].enemy_list.draw()
         self.rooms[self.current_room].projectile_list.draw()
         self.player_list.draw()
+        self.rooms[self.current_room].item_list.draw()
+
 
         bar_width = 200
         bar_height = 20
