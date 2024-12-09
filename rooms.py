@@ -2,6 +2,7 @@ import arcade
 import json
 
 from enemies import Enemy, Guard
+from player import Player
 
 SPRITE_SCALING = 0.4
 SPRITE_NATIVE_SIZE = 128
@@ -9,10 +10,8 @@ SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 SPRITE_SCALING_PROJECTILE = 0.2
 PROJECTILE_SPEED = 4
 
-
 MOVEMENT_SPEED = 3
 ENEMY_SPEED = 0.75
-
 
 
 class healingItem(arcade.Sprite):
@@ -32,8 +31,8 @@ class Water(arcade.Sprite):
         super().__init__(image, scaling)
         self.speed_modifier = speed_modifier
 
-    def apply_effect(self, player):
-        player.current_movement_speed *= self.speed_modifier
+    def apply_effect(self, player: Player):
+        player.current_movement_speed = self.speed_modifier * player.base_movement_speed
 
 
 class Room:

@@ -1,4 +1,4 @@
-
+{
   "rooms": [
     {
       "background": "images/skeleton_background_1.png",
@@ -59,7 +59,6 @@
     }
   ]
 }
-
 
 
 

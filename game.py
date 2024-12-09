@@ -3,6 +3,7 @@ import os
 import math
 import time
 
+from player import Player
 from rooms import load_rooms_from_json
 from enemies import Enemy, Guard
 
@@ -23,52 +24,60 @@ ENEMY_SPEED = 0.75
 class MyGame(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
-        self.player_attack_cooldown = 0.50
-        self.last_attack_time = 0
+        # self.player_attack_cooldown = 0.50
+        # self.last_attack_time = 0
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
         self.current_room = 0
         self.rooms = None
-        self.player_sprite = None
+        self.player = None
         self.player_list = None
         self.physics_engine = None
-        self.player_health = 100
-        self.max_health = 100
+        # self.player_health = 100
+        # self.max_health = 100
         self.is_game_over = False
-        self.base_movement_speed = MOVEMENT_SPEED
-        self.current_movement_speed = MOVEMENT_SPEED
+        # self.base_movement_speed = MOVEMENT_SPEED
+        # self.current_movement_speed = MOVEMENT_SPEED
 
-    def player_attack(self):
-        cur_time = time.time()
-        if cur_time - self.last_attack_time >= self.player_attack_cooldown:
-            self.last_attack_time = cur_time
-            return True
-        return False
+        self.left_pressed = False
+        self.right_pressed = False
+        self.up_pressed = False
+        self.down_pressed = False
 
-    def perform_attack(self):
-        if self.rooms[self.current_room].enemy_list:
-            for enemy in self.rooms[self.current_room].enemy_list:
-                if arcade.check_for_collision(self.player_sprite, enemy):
-                    enemy.take_damage(10)
+    # def player_attack(self):
+    #     cur_time = time.time()
+    #     if cur_time - self.last_attack_time >= self.player_attack_cooldown:
+    #         self.last_attack_time = cur_time
+    #         return True
+    #     return False
+
+    # def perform_attack(self):
+    #     if self.rooms[self.current_room].enemy_list:
+    #         for enemy in self.rooms[self.current_room].enemy_list:
+    #             if arcade.check_for_collision(self.player_sprite, enemy):
+    #                 enemy.take_damage(10)
 
 
     def setup(self):
-        self.player_sprite = arcade.Sprite("images/knight4.png", SPRITE_SCALING)
-        self.player_sprite.center_x = 100
-        self.player_sprite.center_y = 100
+        self.player = Player("images/knight4.png", SPRITE_SCALING)
+        self.player.center_x = 100
+        self.player.center_y = 100
+        # self.player_sprite = Player("images/knight4.png", SPRITE_SCALING)
+        # self.player_sprite.center_x = 100
+        # self.player_sprite.center_y = 100
         self.player_list = arcade.SpriteList()
-        self.player_list.append(self.player_sprite)
+        self.player_list.append(self.player)
         self.rooms = load_rooms_from_json("levels.json")
         self.current_room = 0
-        self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
+        self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
 
     def change_room(self, next_room):
         if 0 <= next_room < len(self.rooms):
             self.current_room = next_room
             room = self.rooms[self.current_room]
-            self.player_sprite.center_x = room.player_start_x
-            self.player_sprite.center_y = room.player_start_y
-            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, room.wall_list)
+            self.player.center_x = room.player_start_x
+            self.player.center_y = room.player_start_y
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player, room.wall_list)
 
     def on_draw(self):
         self.clear()
@@ -85,7 +94,7 @@ class MyGame(arcade.Window):
         bar_height = 20
         bar_x = 40
         bar_y = 10
-        health_percentage = self.player_health / self.max_health
+        health_percentage = self.player.health / self.player.max_health
         arcade.draw_xywh_rectangle_filled(bar_x, bar_y, bar_width, bar_height, arcade.color.MAROON)
         arcade.draw_xywh_rectangle_filled(bar_x, bar_y, bar_width * health_percentage, bar_height, arcade.color.DARK_GREEN)
         arcade.draw_xywh_rectangle_outline(bar_x, bar_y, bar_width, bar_height, arcade.color.BLACK, border_width=2)
@@ -104,26 +113,39 @@ class MyGame(arcade.Window):
             arcade.draw_xywh_rectangle_filled(bar_x, bar_y, bar_width * health_percentage, bar_height, arcade.color.GREEN)
 
     def on_key_press(self, key, modifiers):
-        if key == arcade.key.SPACE and self.player_attack():
+        if key == arcade.key.SPACE and self.player.can_attack():
             self.perform_attack()
+        
         if key == arcade.key.UP:
-            self.player_sprite.change_y = self.current_movement_speed
+            self.up_pressed = True
         elif key == arcade.key.DOWN:
-            self.player_sprite.change_y = -self.current_movement_speed
+            self.down_pressed = True
         elif key == arcade.key.LEFT:
-            self.player_sprite.change_x = -self.current_movement_speed
+            self.left_pressed = True
         elif key == arcade.key.RIGHT:
-            self.player_sprite.change_x = self.current_movement_speed
+            self.right_pressed = True
+
         if self.is_game_over and key == arcade.key.R:
             self.setup()
             self.is_game_over = False
-            self.player_health = 100
+            # self.player_health = 100
+            self.player.reset_health()
 
     def on_key_release(self, key, modifiers):
-        if key == arcade.key.UP or key == arcade.key.DOWN:
-            self.player_sprite.change_y = 0
-        elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
-            self.player_sprite.change_x = 0
+        """Called when the user releases a key. """
+        if key == arcade.key.UP:
+            self.up_pressed = False
+        elif key == arcade.key.DOWN:
+            self.down_pressed = False
+        elif key == arcade.key.LEFT:
+            self.left_pressed = False
+        elif key == arcade.key.RIGHT:
+            self.right_pressed = False
+
+    def perform_attack(self):
+        for enemy in self.rooms[self.current_room].enemy_list:
+            if arcade.check_for_collision(self.player, enemy):
+                enemy.take_damage(10)
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Called when the mouse button is clicked """
@@ -131,8 +153,8 @@ class MyGame(arcade.Window):
         projectile = arcade.Sprite(":resources:images/tiles/rock.png", SPRITE_SCALING_PROJECTILE)
 
         # Position the projectile at the player's current location
-        start_x = self.player_sprite.center_x
-        start_y = self.player_sprite.center_y
+        start_x = self.player.center_x
+        start_y = self.player.center_y
         projectile.center_x = start_x
         projectile.center_y = start_y
 
@@ -153,19 +175,36 @@ class MyGame(arcade.Window):
 
         # Add the projectile to the appropriate lists
         self.rooms[self.current_room].projectile_list.append(projectile)
-
+    
+        
     def on_update(self, delta_time):
         self.physics_engine.update()
-        self.current_movement_speed = self.base_movement_speed
+        self.player.current_movement_speed = self.player.base_movement_speed
+
+        if self.is_game_over:
+            return
         for lava in self.rooms[self.current_room].lava_list:
-            if arcade.check_for_collision(self.player_sprite, lava):
-                self.player_health -= lava.damage_per_second * delta_time
-                if self.player_health <= 0:
+            if arcade.check_for_collision(self.player, lava):
+                self.player.take_damage(lava.damage_per_second * delta_time)
+                #self.player_health -= lava.damage_per_second * delta_time
+                if self.player.health <= 0:
                     self.is_game_over = True
                     return
         for water in self.rooms[self.current_room].water_list:
-            if arcade.check_for_collision(self.player_sprite, water):
-                water.apply_effect(self)
+            if arcade.check_for_collision(self.player, water):
+                water.apply_effect(self.player)
+
+        # update move character from key presses
+        current_speed = self.player.current_movement_speed
+        self.player.change_y, self.player.change_x = 0, 0
+        if self.up_pressed and not self.down_pressed:
+            self.player.change_y = current_speed
+        elif self.down_pressed and not self.up_pressed:
+            self.player.change_y = -current_speed
+        if self.left_pressed and not self.right_pressed:
+            self.player.change_x = -current_speed
+        elif self.right_pressed and not self.left_pressed:
+            self.player.change_x = current_speed
 
          # Check for room completion and spawn dragon in Cave 3
         current_room = self.rooms[self.current_room]
@@ -173,9 +212,9 @@ class MyGame(arcade.Window):
                 self.spawn_dragon(current_room)
 
         for enemy in self.rooms[self.current_room].enemy_list:
-            enemy.chasing(self.player_sprite)
-            if arcade.check_for_collision(self.player_sprite, enemy) and enemy.canIAtk():
-                self.player_health -= 10
+            enemy.chasing(self.player)
+            if arcade.check_for_collision(self.player, enemy) and enemy.canIAtk():
+                self.player.health -= 10
         # Check for Cave 3 and spawn dragon
         if self.current_room == 2 and not self.rooms[self.current_room].dragon_spawned:
             guards = [enemy for enemy in self.rooms[self.current_room].enemy_list if isinstance(enemy, Guard)]
@@ -189,29 +228,29 @@ class MyGame(arcade.Window):
                 self.rooms[self.current_room].dragon_spawned = True
 
         for item in self.rooms[self.current_room].item_list:
-            if arcade.check_for_collision(self.player_sprite, item):
-                self.player_health = min(self.max_health, self.player_health + item.heal_amount)
+            if arcade.check_for_collision(self.player, item):
+                self.player.health = min(self.player.max_health, self.player.health + item.heal_amount)
                 item.kill()
         if self.is_game_over:
             return
-        if self.player_health <= 0:
+        if self.player.health <= 0:
             self.is_game_over = True
-        if self.player_sprite.center_x > SCREEN_WIDTH and self.current_room == 0:
+        if self.player.center_x > SCREEN_WIDTH and self.current_room == 0:
             self.current_room = 1
-            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
-            self.player_sprite.center_x = 0
-        elif self.player_sprite.center_x < 0 and self.current_room == 1:
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
+            self.player.center_x = 0
+        elif self.player.center_x < 0 and self.current_room == 1:
             self.current_room = 0
-            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
-            self.player_sprite.center_x = SCREEN_WIDTH
-        elif self.player_sprite.center_x > SCREEN_WIDTH and self.current_room == 1:
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
+            self.player.center_x = SCREEN_WIDTH
+        elif self.player.center_x > SCREEN_WIDTH and self.current_room == 1:
             self.current_room = 2
-            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
-            self.player_sprite.center_x = 0
-        elif self.player_sprite.center_x < 0 and self.current_room == 2:
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
+            self.player.center_x = 0
+        elif self.player.center_x < 0 and self.current_room == 2:
             self.current_room = 1
-            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
-            self.player_sprite.center_x = SCREEN_WIDTH
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
+            self.player.center_x = SCREEN_WIDTH
         
         # Call update on all sprites
         projectiles = self.rooms[self.current_room].projectile_list
