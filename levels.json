@@ -1,16 +1,16 @@
 
   "rooms": [
     {
-      "background": "images/goblin_background.png",
+      "background": "images/skeleton_background_1.png",
       "layout": [
         "WWWWWWWWWWWWWWWWWWWW",
         "W.....W............W",
         "W.......E...WWWW...W",
         "W....W....W........W",
-        "W....W........LL...W",
+        "W....W...H....LL...W",
         "W....W........LL...W",
         "W....W..E...WWWW...W",
-        "W......W..W........W",
+        "W......W..W...H....W",
         "WWWWWW..W...W...AA..",
         "W.......W...W...AA...",
         "W.......W...WWWWWWWW",
@@ -20,10 +20,10 @@
       ]
     },
     {
-      "background": "images/skeleton_background_1.png",
+      "background": "images/goblin_background.png",
       "layout": [
         "WWWWWWWWWWWWWWWWWWWW",
-        "W.......E..LL...AA..",
+        "WH......E..LL...AA..",
         "W.....W.........AA..",
         "W......WWWWWWWW....W",
         "W....W.W......W....W",
@@ -31,7 +31,7 @@
         "W...W...E...WWWWL..W",
         "W...W.......WL....LW",
         ".WWWWW..W...W...E..W",
-        "..AA....W.W.WL....LW",
+        "..AA....W.W.WL.H..LW",
         "WL......W...WWWWWWWW",
         "W....WW.W...W..E..WW",
         "W....W.....AA.....WW",
@@ -43,10 +43,10 @@
       "layout": [
         "WWWWWWWWWWWWWWWWWWWW",
         ".....E..A...W......W",
-        ".........W.W..W....W",
+        ".........W.W..W..H.W",
         "W.......W...W.W....W",
         "W......W..E..W.....W",
-        "W......WL.W.LW.....W",
+        "W...H...WL.W.LW....W",
         "W......W..W..W.....W",
         "W.......W.E.W...W..W",
         "W......WL.W.LW..W..W",
@@ -59,5 +59,7 @@
     }
   ]
 }
+
+
 
 
