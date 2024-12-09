@@ -71,7 +71,7 @@ def load_rooms_from_json(file_path):
                 elif col == "E":
                     # Differentiate between enemy types based on room
                     if room_index == 1:  # Cave 2
-                        goblin = Enemy("images/goblin.png", SPRITE_SCALING * 0.15, speed=1.2)
+                        goblin = Enemy("images/goblin.gif", SPRITE_SCALING * 0.15, speed=1.2)
                         goblin.center_x = x
                         goblin.center_y = y
                         goblin.health = 40  
@@ -108,6 +108,12 @@ def load_rooms_from_json(file_path):
                     healing_item.center_x = x
                     healing_item.center_y = y
                     room.item_list.append(healing_item)
+
+        room.background = arcade.load_texture(room_data["background"])
+        rooms.append(room)
+    return rooms
+
+
 
         room.background = arcade.load_texture(room_data["background"])
         rooms.append(room)
