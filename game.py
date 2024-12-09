@@ -239,16 +239,17 @@ class MyGame(arcade.Window):
 
 
         # Check for Cave 3 and spawn dragon
-        if self.current_room == 2 and not self.rooms[self.current_room].dragon_spawned:
-            guards = [enemy for enemy in self.rooms[self.current_room].enemy_list if isinstance(enemy, Guard)]
-            if len(guards) == 0:
+        #if self.current_room == 2 and not self.rooms[self.current_room].dragon_spawned:
+         #   guards = [enemy for enemy in self.rooms[self.current_room].enemy_list if isinstance(enemy, Guard)]
+          #  if len(guards) == 0:
                 # All guards defeated, spawn the dragon
-                dragon = Enemy("images/boss.png", SPRITE_SCALING * 0.35, speed=1.0)
-                dragon.center_x = SCREEN_WIDTH // 2
-                dragon.center_y = SCREEN_HEIGHT // 2
-                dragon.health = 100  # Dragon has higher health
-                self.rooms[self.current_room].enemy_list.append(dragon)
-                self.rooms[self.current_room].dragon_spawned = True
+           #     dragon = Enemy("images/boss.png", SPRITE_SCALING * 0.35, speed=1.0)
+            #    dragon.center_x = SCREEN_WIDTH // 2
+             #   dragon.center_y = SCREEN_HEIGHT // 2
+              #  dragon.health = 100  # Dragon has higher health
+               # self.rooms[self.current_room].enemy_list.append(dragon)
+                #self.rooms[self.current_room].dragon_spawned = True
+
 
         for item in self.rooms[self.current_room].item_list:
             if arcade.check_for_collision(self.player, item):

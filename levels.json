@@ -9,12 +9,12 @@
         "W....W....W........W",
         "W....W...H....LL...W",
         "W....W........LL...W",
-        "W....W..E...WWWW...W",
-        "W......W..W...H....W",
+        "W.......E...WWWW...W",
+        "W............H.....W",
         "WWWWWW..W...W...AA..",
-        "W.......W...W...AA...",
+        "W......W...W...AA...",
         "W.......W...WWWWWWWW",
-        "W.P..W..W...W..E..WW",
+        "W.P..W..W......E..WW",
         "W....W..W.........WW",
         "WWWWWWWWWWWWWWWWWWWW"
       ]
@@ -24,16 +24,16 @@
       "layout": [
         "WWWWWWWWWWWWWWWWWWWW",
         "WH......E..LL...AA..",
-        "W.....W.........AA..",
+        "W...............AA..",
         "W......WWWWWWWW....W",
         "W....W.W......W....W",
         "W....W........W....W",
         "W...W...E...WWWWL..W",
         "W...W.......WL....LW",
         ".WWWWW..W...W...E..W",
-        "..AA....W.W.WL.H..LW",
+        "..AA....W...WL.H..LW",
         "WL......W...WWWWWWWW",
-        "W....WW.W...W..E..WW",
+        "W....WW.W......E..WW",
         "W....W.....AA.....WW",
         "WWWWWWWWWWWWWWWWWWWW"
       ]
@@ -59,3 +59,9 @@
     }
   ]
 }
+
+
+
+
+
+
