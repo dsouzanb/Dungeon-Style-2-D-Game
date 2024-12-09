@@ -24,8 +24,6 @@ ENEMY_SPEED = 0.75
 class MyGame(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
-        # self.player_attack_cooldown = 0.50
-        # self.last_attack_time = 0
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
         self.current_room = 0
@@ -33,38 +31,18 @@ class MyGame(arcade.Window):
         self.player = None
         self.player_list = None
         self.physics_engine = None
-        # self.player_health = 100
-        # self.max_health = 100
         self.is_game_over = False
-        # self.base_movement_speed = MOVEMENT_SPEED
-        # self.current_movement_speed = MOVEMENT_SPEED
 
         self.left_pressed = False
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
 
-    # def player_attack(self):
-    #     cur_time = time.time()
-    #     if cur_time - self.last_attack_time >= self.player_attack_cooldown:
-    #         self.last_attack_time = cur_time
-    #         return True
-    #     return False
-
-    # def perform_attack(self):
-    #     if self.rooms[self.current_room].enemy_list:
-    #         for enemy in self.rooms[self.current_room].enemy_list:
-    #             if arcade.check_for_collision(self.player_sprite, enemy):
-    #                 enemy.take_damage(10)
-
 
     def setup(self):
         self.player = Player("images/knight4.png", SPRITE_SCALING)
         self.player.center_x = 100
         self.player.center_y = 100
-        # self.player_sprite = Player("images/knight4.png", SPRITE_SCALING)
-        # self.player_sprite.center_x = 100
-        # self.player_sprite.center_y = 100
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
         self.rooms = load_rooms_from_json("levels.json")
@@ -143,6 +121,7 @@ class MyGame(arcade.Window):
             self.right_pressed = False
 
     def perform_attack(self):
+        # if self.rooms[self.current_room].enemy_list:
         for enemy in self.rooms[self.current_room].enemy_list:
             if arcade.check_for_collision(self.player, enemy):
                 enemy.take_damage(10)
@@ -210,11 +189,55 @@ class MyGame(arcade.Window):
         current_room = self.rooms[self.current_room]
         if self.current_room == 2 and not current_room.dragon_spawned and len(current_room.enemy_list) == 0:  # All enemies defeated
                 self.spawn_dragon(current_room)
+        
+        # Update Projectiles
+        projectiles = self.rooms[self.current_room].projectile_list
+        walls = self.rooms[self.current_room].wall_list
+        enemies = self.rooms[self.current_room].enemy_list
+        projectiles.update()
+        for projectile in projectiles:
+            # Check if the projectile hit an enemy
+            hit_list = arcade.check_for_collision_with_list(projectile, enemies)
+            if hit_list:
+                projectile.remove_from_sprite_lists()
+                for enemy in hit_list:
+                    enemy.take_damage(10)
+            # Check if the projectile hit a wall
+            if arcade.check_for_collision_with_list(projectile, walls):
+               projectile.remove_from_sprite_lists()
+            # Remove projectile if it flies off screen
+            if (projectile.bottom > SCREEN_HEIGHT or projectile.top < 0 or
+                    projectile.right < 0 or projectile.left > SCREEN_WIDTH):
+                projectile.remove_from_sprite_lists()
+
+
+            # Store enemy physics engines
+        if not hasattr(self, "enemy_physics_engines"):
+            self.enemy_physics_engines = {}
 
         for enemy in self.rooms[self.current_room].enemy_list:
+            # If the enemy doesn't already have a physics engine, create one
+            if enemy not in self.enemy_physics_engines:
+                self.enemy_physics_engines[enemy] = arcade.PhysicsEngineSimple(enemy, self.rooms[self.current_room].wall_list)
+
+            # Enemy chasing logic
             enemy.chasing(self.player)
+
+            # Update the physics engine for the enemy
+            self.enemy_physics_engines[enemy].update()
+
+            # Check if the enemy collides with the player
             if arcade.check_for_collision(self.player, enemy) and enemy.canIAtk():
                 self.player.health -= 10
+
+        # Clean up physics engines for enemies no longer in the room
+        self.enemy_physics_engines = {
+            enemy: engine
+            for enemy, engine in self.enemy_physics_engines.items()
+            if enemy in self.rooms[self.current_room].enemy_list
+        }
+
+
         # Check for Cave 3 and spawn dragon
         if self.current_room == 2 and not self.rooms[self.current_room].dragon_spawned:
             guards = [enemy for enemy in self.rooms[self.current_room].enemy_list if isinstance(enemy, Guard)]
@@ -271,7 +294,7 @@ class MyGame(arcade.Window):
 
             # If the projectile flies off screen, remove it
             if (projectile.bottom > SCREEN_HEIGHT or projectile.top < 0
-            or projectile.right < 0 or projectile.left > SCREEN_WIDTH):
+            or  projectile.right < 0 or projectile.left > SCREEN_WIDTH):
                 projectile.remove_from_sprite_lists()
 
     def spawn_dragon(self, room):
