@@ -1,18 +1,18 @@
-{
+
   "rooms": [
     {
-      "background": "images/watercave.png",
+      "background": "images/goblin_background.png",
       "layout": [
         "WWWWWWWWWWWWWWWWWWWW",
         "W.....W............W",
         "W.......E...WWWW...W",
         "W....W....W........W",
-        "W....W........H....W",
-        "W....W.............W",
+        "W....W........LL...W",
+        "W....W........LL...W",
         "W....W..E...WWWW...W",
         "W......W..W........W",
-        "WWWWWW..W...W.......",
-        "W.......W...W.......",
+        "WWWWWW..W...W...AA..",
+        "W.......W...W...AA...",
         "W.......W...WWWWWWWW",
         "W.P..W..W...W..E..WW",
         "W....W..W.........WW",
@@ -20,36 +20,36 @@
       ]
     },
     {
-      "background": "images/watercave.png",
+      "background": "images/skeleton_background_1.png",
       "layout": [
         "WWWWWWWWWWWWWWWWWWWW",
-        "W.......E...........",
-        "W.....W......H......",
+        "W.......E..LL...AA..",
+        "W.....W.........AA..",
         "W......WWWWWWWW....W",
         "W....W.W......W....W",
         "W....W........W....W",
-        "W...W...E...WWWW...W",
-        "W...W.......W......W",
-        ".WWWWW..W...W......W",
-        "........W.W.W......W",
-        "W.......W...WWWWWWWW",
+        "W...W...E...WWWWL..W",
+        "W...W.......WL....LW",
+        ".WWWWW..W...W...E..W",
+        "..AA....W.W.WL....LW",
+        "WL......W...WWWWWWWW",
         "W....WW.W...W..E..WW",
-        "W....W............WW",
+        "W....W.....AA.....WW",
         "WWWWWWWWWWWWWWWWWWWW"
       ]
     },
     {
-      "background": "images/lava.png",
+      "background": "images/dragon_background.png",
       "layout": [
         "WWWWWWWWWWWWWWWWWWWW",
-        ".....E......W......W",
-        ".........W.W..W.H..W",
+        ".....E..A...W......W",
+        ".........W.W..W....W",
         "W.......W...W.W....W",
         "W......W..E..W.....W",
-        "W......W..W..W....BW",
+        "W......WL.W.LW.....W",
         "W......W..W..W.....W",
-        "W..H....W.E.W...W..W",
-        "W......W..W..W..W..W",
+        "W.......W.E.W...W..W",
+        "W......WL.W.LW..W..W",
         "W......W..W..W.W...W",
         "W......W..W..W.W...W",
         "W.......W.E.W..W...W",
@@ -59,3 +59,5 @@
     }
   ]
 }
+
+
