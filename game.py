@@ -187,7 +187,7 @@ class MyGame(arcade.Window):
 
          # Check for room completion and spawn dragon in Cave 3
         current_room = self.rooms[self.current_room]
-        if self.current_room == 2 and not current_room.dragon_spawned and len(current_room.enemy_list) == 0:  # All enemies defeated
+        if self.current_room == 4 and not current_room.dragon_spawned and len(current_room.enemy_list) == 0:  # All enemies defeated
                 self.spawn_dragon(current_room)
         
         # Update Projectiles
@@ -239,7 +239,7 @@ class MyGame(arcade.Window):
 
 
          #Check for Cave 3 and spawn dragon
-        if self.current_room == 2 and not self.rooms[self.current_room].dragon_spawned:
+        if self.current_room == 4 and not self.rooms[self.current_room].dragon_spawned:
             guards = [enemy for enemy in self.rooms[self.current_room].enemy_list if isinstance(enemy, Guard)]
             if len(guards) == 0:
                 # All guards defeated, spawn the dragon
@@ -338,7 +338,7 @@ class StartScreen(arcade.View):
         )
     
     def on_key_press(self, key, modifiers):
-        print(f"Key pressed: {key}")  
+        print(f"Key pressed: {key}")
         if key == arcade.key.ENTER:
             game_view = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
             game_view.setup()
@@ -352,4 +352,3 @@ def main():
     
 if __name__ == "__main__":
     main()
-
