@@ -257,6 +257,20 @@ class MyGame(arcade.Window):
                 item.kill()
         if self.is_game_over:
             return
+            # Check if enemies are defeated
+        if len(self.rooms[self.current_room].enemy_list) > 0:
+            #Check Player Boundaries
+            if self.player.center_x < 0:
+                self.player.center_x = 0
+            elif self.player.center_x > SCREEN_WIDTH:
+                self.player.center_x = SCREEN_WIDTH
+                
+            if self.player.center_y < 0:
+                self.player.center_y = 0
+            elif self.player.center_y > SCREEN_HEIGHT:
+                self.player.center_y = SCREEN_HEIGHT
+                
+            return
         if self.player.health <= 0:
             self.is_game_over = True
         if self.player.center_x > SCREEN_WIDTH and self.current_room == 0:
@@ -299,3 +313,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
