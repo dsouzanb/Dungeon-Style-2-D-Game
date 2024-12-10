@@ -238,17 +238,17 @@ class MyGame(arcade.Window):
         }
 
 
-        # Check for Cave 3 and spawn dragon
-        #if self.current_room == 2 and not self.rooms[self.current_room].dragon_spawned:
-         #   guards = [enemy for enemy in self.rooms[self.current_room].enemy_list if isinstance(enemy, Guard)]
-          #  if len(guards) == 0:
+         #Check for Cave 3 and spawn dragon
+        if self.current_room == 2 and not self.rooms[self.current_room].dragon_spawned:
+            guards = [enemy for enemy in self.rooms[self.current_room].enemy_list if isinstance(enemy, Guard)]
+            if len(guards) == 0:
                 # All guards defeated, spawn the dragon
-           #     dragon = Enemy("images/boss.png", SPRITE_SCALING * 0.35, speed=1.0)
-            #    dragon.center_x = SCREEN_WIDTH // 2
-             #   dragon.center_y = SCREEN_HEIGHT // 2
-              #  dragon.health = 100  # Dragon has higher health
-               # self.rooms[self.current_room].enemy_list.append(dragon)
-                #self.rooms[self.current_room].dragon_spawned = True
+                dragon = Enemy("images/boss.png", SPRITE_SCALING * 0.35, speed=1.0)
+                dragon.center_x = SCREEN_WIDTH // 2
+                dragon.center_y = SCREEN_HEIGHT // 2
+                dragon.health = 100  # Dragon has higher health
+                self.rooms[self.current_room].enemy_list.append(dragon)
+                self.rooms[self.current_room].dragon_spawned = True
 
 
         for item in self.rooms[self.current_room].item_list:
@@ -276,22 +276,6 @@ class MyGame(arcade.Window):
             self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
             self.player.center_x = SCREEN_WIDTH
         
-        # Call update on all sprites
-        projectiles = self.rooms[self.current_room].projectile_list
-        enemies = self.rooms[self.current_room].enemy_list
-
-        projectiles.update()
-
-        # Loop thru each projectile
-        for projectile in projectiles:
-            # Check this projectile to see if it hit an enemy
-            hit_list = arcade.check_for_collision_with_list(projectile, enemies)
-
-            # If it did, get rid of projectile
-            if hit_list:
-                projectile.remove_from_sprite_lists()
-                for enemy in hit_list:
-                    enemy.take_damage(10)
 
             # If the projectile flies off screen, remove it
             if (projectile.bottom > SCREEN_HEIGHT or projectile.top < 0
