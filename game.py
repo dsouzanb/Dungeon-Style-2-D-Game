@@ -7,6 +7,8 @@ from player import Player
 from rooms import load_rooms_from_json
 from enemies import Enemy, Guard
 
+from soundlists import sound_list
+
 SPRITE_SCALING = 0.4
 SPRITE_NATIVE_SIZE = 128
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
@@ -48,6 +50,7 @@ class MyGame(arcade.Window):
         self.rooms = load_rooms_from_json("levels.json")
         self.current_room = 0
         self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
+        self.sound_list = sound_list
 
     def change_room(self, next_room):
         if 0 <= next_room < len(self.rooms):
@@ -93,6 +96,7 @@ class MyGame(arcade.Window):
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE and self.player.can_attack():
             self.perform_attack()
+            arcade.play_sound(self.sound_list[5])
         
         if key == arcade.key.UP:
             self.up_pressed = True
@@ -155,6 +159,7 @@ class MyGame(arcade.Window):
 
         # Add the projectile to the appropriate lists
         self.rooms[self.current_room].projectile_list.append(projectile)
+        arcade.play_sound(self.sound_list[0])
     
         
     def on_update(self, delta_time):
@@ -188,6 +193,7 @@ class MyGame(arcade.Window):
          # Check for room completion and spawn dragon in Cave 5
         current_room = self.rooms[self.current_room]
         if self.current_room == 4 and not current_room.dragon_spawned and len(current_room.enemy_list) == 0:  # All enemies defeated
+                arcade.play_sound(self.sound_list[6])
                 self.spawn_dragon(current_room)
         
         # Update Projectiles
@@ -228,6 +234,7 @@ class MyGame(arcade.Window):
 
             # Check if the enemy collides with the player
             if arcade.check_for_collision(self.player, enemy) and enemy.canIAtk():
+                arcade.play_sound(self.sound_list[1])
                 self.player.health -= 10
 
         # Clean up physics engines for enemies no longer in the room
@@ -253,6 +260,7 @@ class MyGame(arcade.Window):
         for item in self.rooms[self.current_room].item_list:
             if arcade.check_for_collision(self.player, item):
                 self.player.health = min(self.player.max_health, self.player.health + item.heal_amount)
+                arcade.play_sound(self.sound_list[4])
                 item.kill()
         if self.is_game_over:
             return
