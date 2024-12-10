@@ -323,41 +323,11 @@ class MyGame(arcade.Window):
         room.dragon_spawned = True
         print("Dragon has spawned!")
 
-# Start Screen Class
-class StartScreen(arcade.View):
-    def on_show(self):
-        arcade.set_background_color(arcade.color.BLACK)
-    
-    def on_draw(self):
-        self.clear()
-        arcade.draw_text(
-            "Dungeon Game",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 + 50,
-            arcade.color.WHITE,
-            40,
-            anchor_x="center"
-        )
-        arcade.draw_text(
-            "Press ENTER to Start",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 - 50,
-            arcade.color.GRAY,
-            font_size = 20,
-            anchor_x="center"
-        )
-    
-    def on_key_press(self, key, modifiers):
-        print(f"Key pressed: {key}")
-        if key == arcade.key.ENTER:
-            game_view = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-            game_view.setup()
-            self.window.show_view(game_view)
+
 
 def main():
-    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    start_view = StartScreen()
-    window.show_view(start_view)
+    game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    game.setup()
     arcade.run()
     
 if __name__ == "__main__":
