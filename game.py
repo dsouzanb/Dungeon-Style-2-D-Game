@@ -39,6 +39,7 @@ class MyGame(arcade.Window):
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
+        self.sound_list = sound_list
 
 
     def setup(self):
@@ -50,7 +51,7 @@ class MyGame(arcade.Window):
         self.rooms = load_rooms_from_json("levels.json")
         self.current_room = 0
         self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
-        self.sound_list = sound_list
+
 
     def change_room(self, next_room):
         if 0 <= next_room < len(self.rooms):
