@@ -1,6 +1,8 @@
 import arcade
 import time
 
+from soundlists import sound_list
+
 SPRITE_SCALING = 0.4
 MOVEMENT_SPEED = 3
 
@@ -15,6 +17,8 @@ class Player(arcade.Sprite):
         self.last_projectile_time = 0
         self.base_movement_speed = MOVEMENT_SPEED
         self.current_movement_speed = MOVEMENT_SPEED
+        self.sound_list = sound_list
+  
 
     def can_attack(self):
         cur_time = time.time()
@@ -31,9 +35,11 @@ class Player(arcade.Sprite):
         return False
 
     def take_damage(self, amount):
+        arcade.play_sound(self.sound_list[1])
         self.health = max(0, self.health - amount)
 
     def heal(self, amount):
+        arcade.play_sound(self.sound_list[4])
         self.health = min(self.max_health, self.health + amount)
 
     def reset_health(self):
@@ -48,4 +54,5 @@ class Player(arcade.Sprite):
             self.left_pressed = True
         elif key == arcade.key.RIGHT:
             self.right_pressed = True
-        
+         
+    
