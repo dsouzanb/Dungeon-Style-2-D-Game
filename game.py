@@ -5,7 +5,7 @@ import time
 
 from player import Player
 from rooms import load_rooms_from_json
-from enemies import Enemy, Guard, Dragon
+from enemies import Enemy, Guard
 
 SPRITE_SCALING = 0.4
 SPRITE_NATIVE_SIZE = 128
@@ -185,7 +185,7 @@ class MyGame(arcade.Window):
         elif self.right_pressed and not self.left_pressed:
             self.player.change_x = current_speed
 
-         # Check for room completion and spawn dragon in Cave 3
+         # Check for room completion and spawn dragon in Cave 5
         current_room = self.rooms[self.current_room]
         if self.current_room == 4 and not current_room.dragon_spawned and len(current_room.enemy_list) == 0:  # All enemies defeated
                 self.spawn_dragon(current_room)
@@ -304,7 +304,7 @@ class MyGame(arcade.Window):
                 projectile.remove_from_sprite_lists()
 
     def spawn_dragon(self, room):
-        dragon = Dragon("images/boss.png", SPRITE_SCALING * 0.5, speed=1.5)
+        dragon = Enemy("images/boss.png", SPRITE_SCALING * 0.3, speed=1.5)
         dragon.is_dragon = True
         dragon.center_x = room.boss_start_x or SCREEN_WIDTH //2
         dragon.center_y = room.boss_start_y or SCREEN_HEIGHT //2
