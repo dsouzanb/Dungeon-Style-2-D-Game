@@ -254,6 +254,7 @@ class MyGame(arcade.Window):
                 
                 # Check if the dragon collides with the player and can attack
                 if arcade.check_for_collision(self.player, enemy) and enemy.canIAtk():
+                    arcade.play_sound(self.sound_list[1])
                     self.player.health -= 20  # Higher damage for the dragon
 
 
