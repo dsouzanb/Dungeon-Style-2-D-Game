@@ -12,7 +12,7 @@ SPRITE_NATIVE_SIZE = 128
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 
 SPRITE_SCALING_PROJECTILE = 0.2
-PROJECTILE_SPEED = 4
+PROJECTILE_SPEED = 3
 
 SCREEN_WIDTH = SPRITE_SIZE * 20
 SCREEN_HEIGHT = SPRITE_SIZE * 14
@@ -106,7 +106,6 @@ class MyGame(arcade.Window):
         if self.is_game_over and key == arcade.key.R:
             self.setup()
             self.is_game_over = False
-            # self.player_health = 100
             self.player.reset_health()
 
     def on_key_release(self, key, modifiers):
@@ -121,13 +120,15 @@ class MyGame(arcade.Window):
             self.right_pressed = False
 
     def perform_attack(self):
-        # if self.rooms[self.current_room].enemy_list:
         for enemy in self.rooms[self.current_room].enemy_list:
             if arcade.check_for_collision(self.player, enemy):
                 enemy.take_damage(10)
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Called when the mouse button is clicked """
+        if not self.player.can_shoot():
+            return      # If player can't shoot yet, do nothing
+        
         # Create a projectile
         projectile = arcade.Sprite(":resources:images/tiles/rock.png", SPRITE_SCALING_PROJECTILE)
 
@@ -165,7 +166,6 @@ class MyGame(arcade.Window):
         for lava in self.rooms[self.current_room].lava_list:
             if arcade.check_for_collision(self.player, lava):
                 self.player.take_damage(lava.damage_per_second * delta_time)
-                #self.player_health -= lava.damage_per_second * delta_time
                 if self.player.health <= 0:
                     self.is_game_over = True
                     return
@@ -211,7 +211,7 @@ class MyGame(arcade.Window):
                 projectile.remove_from_sprite_lists()
 
 
-            # Store enemy physics engines
+        # Store enemy physics engines
         if not hasattr(self, "enemy_physics_engines"):
             self.enemy_physics_engines = {}
 
@@ -239,16 +239,16 @@ class MyGame(arcade.Window):
 
 
         # Check for Cave 3 and spawn dragon
-        #if self.current_room == 2 and not self.rooms[self.current_room].dragon_spawned:
-         #   guards = [enemy for enemy in self.rooms[self.current_room].enemy_list if isinstance(enemy, Guard)]
-          #  if len(guards) == 0:
+        if self.current_room == 2 and not self.rooms[self.current_room].dragon_spawned:
+            guards = [enemy for enemy in self.rooms[self.current_room].enemy_list if isinstance(enemy, Guard)]
+            if len(guards) == 0:
                 # All guards defeated, spawn the dragon
-           #     dragon = Enemy("images/boss.png", SPRITE_SCALING * 0.35, speed=1.0)
-            #    dragon.center_x = SCREEN_WIDTH // 2
-             #   dragon.center_y = SCREEN_HEIGHT // 2
-              #  dragon.health = 100  # Dragon has higher health
-               # self.rooms[self.current_room].enemy_list.append(dragon)
-                #self.rooms[self.current_room].dragon_spawned = True
+                dragon = Enemy("images/boss.png", SPRITE_SCALING * 0.35, speed=1.0)
+                dragon.center_x = SCREEN_WIDTH // 2
+                dragon.center_y = SCREEN_HEIGHT // 2
+                dragon.health = 100  # Dragon has higher health
+                self.rooms[self.current_room].enemy_list.append(dragon)
+                self.rooms[self.current_room].dragon_spawned = True
 
 
         for item in self.rooms[self.current_room].item_list:

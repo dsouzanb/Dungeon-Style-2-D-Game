@@ -11,6 +11,8 @@ class Player(arcade.Sprite):
         self.max_health = 100
         self.attack_cooldown = 0.50
         self.last_attack_time = 0
+        self.projectile_cooldown = 0.25
+        self.last_projectile_time = 0
         self.base_movement_speed = MOVEMENT_SPEED
         self.current_movement_speed = MOVEMENT_SPEED
 
@@ -18,6 +20,13 @@ class Player(arcade.Sprite):
         cur_time = time.time()
         if cur_time - self.last_attack_time >= self.attack_cooldown:
             self.last_attack_time = cur_time
+            return True
+        return False
+    
+    def can_shoot(self):
+        cur_time = time.time()
+        if cur_time - self.last_projectile_time >= self.projectile_cooldown:
+            self.last_projectile_time = cur_time
             return True
         return False
 
