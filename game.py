@@ -273,20 +273,28 @@ class MyGame(arcade.Window):
             return
         if self.player.health <= 0:
             self.is_game_over = True
-        if self.player.center_x > SCREEN_WIDTH and self.current_room == 0:
-            self.current_room = 1
+        if self.player.center_x > SCREEN_WIDTH:
+            if self.current_room == 0:
+                self.current_room = 1
+            elif self.current_room == 1:
+                self.current_room = 2
+            elif self.current_room == 2:
+                self.current_room = 3
+            elif self.current_room == 3:
+                self.current_room = 4
+            # Reset player position to the left edge of the next room
             self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
             self.player.center_x = 0
-        elif self.player.center_x < 0 and self.current_room == 1:
-            self.current_room = 0
-            self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
-            self.player.center_x = SCREEN_WIDTH
-        elif self.player.center_x > SCREEN_WIDTH and self.current_room == 1:
-            self.current_room = 2
-            self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
-            self.player.center_x = 0
-        elif self.player.center_x < 0 and self.current_room == 2:
-            self.current_room = 1
+        elif self.player.center_x < 0:
+            if self.current_room == 1:
+                self.current_room = 0
+            elif self.current_room == 2:
+                self.current_room = 1
+            elif self.current_room == 3:
+                self.current_room = 2
+            elif self.current_room == 4:
+                self.current_room = 3
+            # Reset player position to the right edge of the previous room
             self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
             self.player.center_x = SCREEN_WIDTH
         
