@@ -1,4 +1,4 @@
-mport arcade
+import arcade
 import time
 from soundlists import sound_list
 
