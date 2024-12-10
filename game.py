@@ -7,6 +7,8 @@ from player import Player
 from rooms import load_rooms_from_json
 from enemies import Enemy, Guard
 
+from soundlists import sound_list
+
 SPRITE_SCALING = 0.4
 SPRITE_NATIVE_SIZE = 128
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
@@ -37,6 +39,7 @@ class MyGame(arcade.Window):
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
+        self.sound_list = sound_list
 
 
     def setup(self):
@@ -45,6 +48,8 @@ class MyGame(arcade.Window):
         self.player.center_y = 100
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
+
+
         self.rooms = load_rooms_from_json("levels.json")
         self.current_room = 0
         self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
@@ -93,6 +98,7 @@ class MyGame(arcade.Window):
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE and self.player.can_attack():
             self.perform_attack()
+            arcade.play_sound(self.sound_list[5])
         
         if key == arcade.key.UP:
             self.up_pressed = True
@@ -155,6 +161,7 @@ class MyGame(arcade.Window):
 
         # Add the projectile to the appropriate lists
         self.rooms[self.current_room].projectile_list.append(projectile)
+        arcade.play_sound(self.sound_list[0])
     
         
     def on_update(self, delta_time):
@@ -187,7 +194,8 @@ class MyGame(arcade.Window):
 
          # Check for room completion and spawn dragon in Cave 3
         current_room = self.rooms[self.current_room]
-        if self.current_room == 4 and not current_room.dragon_spawned and len(current_room.enemy_list) == 0:  # All enemies defeated
+        if self.current_room == 2 and not current_room.dragon_spawned and len(current_room.enemy_list) == 0:  # All enemies defeated
+                arcade.play_sound(self.sound_list[6])
                 self.spawn_dragon(current_room)
         
         # Update Projectiles
@@ -228,6 +236,7 @@ class MyGame(arcade.Window):
 
             # Check if the enemy collides with the player
             if arcade.check_for_collision(self.player, enemy) and enemy.canIAtk():
+                arcade.play_sound(self.sound_list[1])
                 self.player.health -= 10
 
         # Clean up physics engines for enemies no longer in the room
@@ -239,7 +248,7 @@ class MyGame(arcade.Window):
 
 
          #Check for Cave 3 and spawn dragon
-        if self.current_room == 4 and not self.rooms[self.current_room].dragon_spawned:
+        if self.current_room == 2 and not self.rooms[self.current_room].dragon_spawned:
             guards = [enemy for enemy in self.rooms[self.current_room].enemy_list if isinstance(enemy, Guard)]
             if len(guards) == 0:
                 # All guards defeated, spawn the dragon
@@ -254,6 +263,7 @@ class MyGame(arcade.Window):
         for item in self.rooms[self.current_room].item_list:
             if arcade.check_for_collision(self.player, item):
                 self.player.health = min(self.player.max_health, self.player.health + item.heal_amount)
+                arcade.play_sound(self.sound_list[4])
                 item.kill()
         if self.is_game_over:
             return
@@ -273,28 +283,20 @@ class MyGame(arcade.Window):
             return
         if self.player.health <= 0:
             self.is_game_over = True
-        if self.player.center_x > SCREEN_WIDTH:
-            if self.current_room == 0:
-                self.current_room = 1
-            elif self.current_room == 1:
-                self.current_room = 2
-            elif self.current_room == 2:
-                self.current_room = 3
-            elif self.current_room == 3:
-                self.current_room = 4
-            # Reset player position to the left edge of the next room
+        if self.player.center_x > SCREEN_WIDTH and self.current_room == 0:
+            self.current_room = 1
             self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
             self.player.center_x = 0
-        elif self.player.center_x < 0:
-            if self.current_room == 1:
-                self.current_room = 0
-            elif self.current_room == 2:
-                self.current_room = 1
-            elif self.current_room == 3:
-                self.current_room = 2
-            elif self.current_room == 4:
-                self.current_room = 3
-            # Reset player position to the right edge of the previous room
+        elif self.player.center_x < 0 and self.current_room == 1:
+            self.current_room = 0
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
+            self.player.center_x = SCREEN_WIDTH
+        elif self.player.center_x > SCREEN_WIDTH and self.current_room == 1:
+            self.current_room = 2
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
+            self.player.center_x = 0
+        elif self.player.center_x < 0 and self.current_room == 2:
+            self.current_room = 1
             self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.rooms[self.current_room].wall_list)
             self.player.center_x = SCREEN_WIDTH
         
@@ -311,55 +313,13 @@ class MyGame(arcade.Window):
         dragon.health = 150  # Set a higher health for the dragon
         room.enemy_list.append(dragon)
         room.dragon_spawned = True
-        print("Dragon has spawned!")
+
+def main():
+    game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    game.setup()
+    arcade.run()
 
 
-class MenuScreen(arcade.View):  
-   def on_show(self):  
-      arcade.set_background_color(arcade.color.BLACK)  
-  
-   def on_draw(self):  
-      self.clear()  
-      arcade.draw_text(  
-        "Dungeon Game",  
-        SCREEN_WIDTH / 2,  
-        SCREEN_HEIGHT / 2 + 50,  
-        arcade.color.WHITE,  
-        40,  
-        anchor_x="center"  
-      )  
-      arcade.draw_text(  
-        "Press ENTER to Start",  
-        SCREEN_WIDTH / 2,  
-        SCREEN_HEIGHT / 2 - 50,  
-        arcade.color.GRAY,  
-        font_size=20,  
-        anchor_x="center"  
-      )  
-      arcade.draw_text(  
-        "Press Q to Quit",  
-        SCREEN_WIDTH / 2,  
-        SCREEN_HEIGHT / 2 - 100,  
-        arcade.color.GRAY,  
-        font_size=20,  
-        anchor_x="center"  
-      )  
-  
-   def on_key_press(self, key, modifiers):  
-      if key == arcade.key.ENTER:  
-        game_view = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)  
-        game_view.setup()  
-        self.window.show_view(game_view)  
-      elif key == arcade.key.Q:  
-        arcade.close_window()  
-  
-  
-def main():  
-   window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)  
-   start_view = MenuScreen()  
-   window.show_view(start_view)  
-   arcade.run()  
-  
-  
-if __name__ == "__main__":  
-   main()
+if __name__ == "__main__":
+    main()
+
