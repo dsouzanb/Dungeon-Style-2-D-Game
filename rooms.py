@@ -57,7 +57,7 @@ def load_rooms_from_json(file_path):
         room = Room()
         for row_index, row in enumerate(room_data["layout"]):
             for col_index, col in enumerate(row):
-                x = (col_index * SPRITE_SIZE) + 25 
+                x = (col_index * SPRITE_SIZE) + 25
                 y = ((len(room_data["layout"]) - row_index - 1) * SPRITE_SIZE) + 25
                 if col == "W":
                     wall = arcade.Sprite(":resources:images/tiles/stone.png", SPRITE_SCALING)
@@ -69,17 +69,17 @@ def load_rooms_from_json(file_path):
                     room.player_start_y = y
                 elif col == "E":
                     # Differentiate between enemy types based on room
-                    if room_index == 1:  # Cave 2
+                    if room_index == 2 or room_index == 3:  # Cave 2
                         goblin = Enemy("images/goblin.gif", SPRITE_SCALING * 0.15, speed=1.2)
                         goblin.center_x = x
                         goblin.center_y = y
-                        goblin.health = 40  
+                        goblin.health = 40
                         room.enemy_list.append(goblin)
-                    elif room_index == 2: # Cave 3
+                    elif room_index == 4: # Cave 3
                         guard = Guard("images/guard.png", SPRITE_SCALING * 0.3, speed=2)
                         guard.center_x = x
                         guard.center_y = y
-                        guard.health = 50  
+                        guard.health = 50
                         room.enemy_list.append(guard)
                     else:  # Other caves use skeletons
                         enemy = Enemy("images/skeleton_warrior.png", (SPRITE_SCALING *0.4), speed=2)
