@@ -1,4 +1,4 @@
-import arcade
+mport arcade
 import time
 from soundlists import sound_list
 
@@ -20,6 +20,7 @@ class Enemy(arcade.Sprite):
         self.atk_cooldown = 1.0
         self.health = 30
         self.sound_list = sound_list
+        self.is_dragon = False
 
     def take_damage(self, amount):
         self.health -= amount
@@ -33,7 +34,7 @@ class Enemy(arcade.Sprite):
         y_diff = player_sprite.center_y - self.center_y
         distance = (x_diff**2 + y_diff**2) ** 0.5
 
-        if distance < 100:
+        if distance < 300:
             if distance > 5:
                 x_step = (x_diff / distance) * self.speed
                 y_step = (y_diff / distance) * self.speed
