@@ -314,11 +314,52 @@ class MyGame(arcade.Window):
         print("Dragon has spawned!")
 
 
-
-def main():
-    game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game.setup()
-    arcade.run()
-    
-if __name__ == "__main__":
-    main()
+class MenuScreen(arcade.View):  
+   def on_show(self):  
+      arcade.set_background_color(arcade.color.BLACK)  
+  
+   def on_draw(self):  
+      self.clear()  
+      arcade.draw_text(  
+        "Dungeon Game",  
+        SCREEN_WIDTH / 2,  
+        SCREEN_HEIGHT / 2 + 50,  
+        arcade.color.WHITE,  
+        40,  
+        anchor_x="center"  
+      )  
+      arcade.draw_text(  
+        "Press ENTER to Start",  
+        SCREEN_WIDTH / 2,  
+        SCREEN_HEIGHT / 2 - 50,  
+        arcade.color.GRAY,  
+        font_size=20,  
+        anchor_x="center"  
+      )  
+      arcade.draw_text(  
+        "Press Q to Quit",  
+        SCREEN_WIDTH / 2,  
+        SCREEN_HEIGHT / 2 - 100,  
+        arcade.color.GRAY,  
+        font_size=20,  
+        anchor_x="center"  
+      )  
+  
+   def on_key_press(self, key, modifiers):  
+      if key == arcade.key.ENTER:  
+        game_view = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)  
+        game_view.setup()  
+        self.window.show_view(game_view)  
+      elif key == arcade.key.Q:  
+        arcade.close_window()  
+  
+  
+def main():  
+   window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)  
+   start_view = MenuScreen()  
+   window.show_view(start_view)  
+   arcade.run()  
+  
+  
+if __name__ == "__main__":  
+   main()
