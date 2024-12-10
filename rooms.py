@@ -114,7 +114,7 @@ def load_rooms_from_json(file_path):
 
 
 
-        room.background = arcade.load_texture(room_data["background"])
-        rooms.append(room)
+    room.background = arcade.load_texture(room_data["background"])
+    rooms.append(room)
     return rooms
 
