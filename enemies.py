@@ -29,7 +29,7 @@ class Enemy(arcade.Sprite):
         y_diff = player_sprite.center_y - self.center_y
         distance = (x_diff**2 + y_diff**2) ** 0.5
 
-        if distance < 100:
+        if distance < 300:
             if distance > 5:
                 x_step = (x_diff / distance) * self.speed
                 y_step = (y_diff / distance) * self.speed
@@ -46,3 +46,4 @@ class Enemy(arcade.Sprite):
 class Guard(Enemy):
     def __init__(self, image, scaling, speed):
         super().__init__(image, scaling, speed)
+
